@@ -1,0 +1,30 @@
+menus:
+- type: menu
+  name: file
+  items:
+  - type: menuitem
+    name: one
+  - type: menuitem
+    name: two
+- type: menu
+  name: edit
+  items:
+  - type: menuitem
+    name: undo
+  - type: menuitem
+    name: redo
+- type: menu
+  name: view
+  items:
+  - type: menuitem
+    name: a
+#  - type: menu
+#    name: subview
+#    items:
+#    - type: menuitem
+#      name: subviewitem
+#    - type: menu
+#      name: subviewmenu
+#      items:
+#      - type: menuitem
+#        name: subsubviewitem
