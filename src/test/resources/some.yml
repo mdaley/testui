@@ -1,0 +1,8 @@
+a: aa
+b:
+  - c: cc
+    d: 1
+  - c: ccc
+    d: 2
+  - c: cccc
+    d: 3
