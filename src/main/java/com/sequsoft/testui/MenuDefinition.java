@@ -5,7 +5,7 @@ import java.util.List;
 public class MenuDefinition {
     private String type;
     private String name;
-    private List<MenuItemDefinition> items;
+    private List<MenuDefinition> items;
 
     public String getName() {
         return name;
@@ -23,11 +23,11 @@ public class MenuDefinition {
         this.type = type;
     }
 
-    public List<MenuItemDefinition> getItems() {
+    public List<MenuDefinition> getItems() {
         return items;
     }
 
-    public void setItems(List<MenuItemDefinition> items) {
+    public void setItems(List<MenuDefinition> items) {
         this.items = items;
     }
 }

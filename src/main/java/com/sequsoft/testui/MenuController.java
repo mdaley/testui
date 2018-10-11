@@ -30,19 +30,27 @@ public class MenuController {
             String menuName = menuDef.getName();
             Menu m = new Menu(menuName);
             m.setId(menuName);
-            menuDef.getItems().forEach(itemDef -> {
-                String itemName = itemDef.getName();
-                String itemText = menusBundle.getString(menuName + "-" + itemName);
-                MenuItem i = new MenuItem(itemText);
-                i.setId(itemName);
-                m.getItems().add(i);
-            });
+
+            menuDef.getItems().forEach(i -> createMenu(m, i));
 
             menuBar.getMenus().add(m);
         });
 
         Menu file = new Menu("File");
         menuBar.setUseSystemMenuBar(true);
+    }
+
+    private void createMenu(Menu menu, MenuDefinition menuDef) {
+        if (menuDef.getType().equals("menu")) {
+            Menu m = new Menu(menuDef.getName());
+            m.setId(menu.getId() + "-" + menuDef.getName());
+            menu.getItems().add(m);
+            menuDef.getItems().forEach(i -> createMenu(m, i));
+        } else { // menuitem
+            MenuItem m = new MenuItem(menuDef.getName());
+            m.setId(menu.getId() + "-" + menuDef.getName());
+            menu.getItems().add(m);
+        }
     }
 
     public MenuBar getMenuBar() {

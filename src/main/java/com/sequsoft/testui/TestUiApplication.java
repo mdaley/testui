@@ -49,18 +49,7 @@ public class TestUiApplication extends Application {
 
         children.add(l);
 
-        /*menuBar.setUseSystemMenuBar(true);
-        menuBar.getMenus().add(file);
-
-        MenuItem one = new MenuItem(menusBundle.getString("FILE_ONE"));
-        one.setId("FILE_ONE");
-        MenuItem two = new MenuItem(menusBundle.getString("FILE_TWO"));
-        two.setId("FILE_TWO");
-
-        file.getItems().add(one);
-        file.getItems().add(two);
-
-        menuBar.addEventHandler(LOCALE_CHANGE, x -> {
+        /*menuBar.addEventHandler(LOCALE_CHANGE, x -> {
             menuBar.getMenus().forEach(m -> {
                 m.getItems().forEach(i -> {
                     i.setText(menusBundle.getString(i.getId()));
