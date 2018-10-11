@@ -1,4 +1,4 @@
-package com.sequsoft.testui;
+package com.sequsoft.testui.menu;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -20,7 +20,7 @@ public class MenuController {
 
     private void createMenuBar() {
 
-        menusBundle = ResourceBundle.getBundle("menus", Locale.ENGLISH);
+        menusBundle = ResourceBundle.getBundle("menu/menus", Locale.ENGLISH);
 
         menuBar = new MenuBar();
 

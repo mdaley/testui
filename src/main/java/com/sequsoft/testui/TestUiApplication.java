@@ -1,5 +1,6 @@
 package com.sequsoft.testui;
 
+import com.sequsoft.testui.menu.MenuController;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.EventType;

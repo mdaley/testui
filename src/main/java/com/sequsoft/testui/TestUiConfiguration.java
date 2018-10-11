@@ -1,5 +1,7 @@
 package com.sequsoft.testui;
 
+import com.sequsoft.testui.menu.MenuController;
+import com.sequsoft.testui.menu.MenusDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,7 +12,7 @@ public class TestUiConfiguration {
 
     @Bean
     MenusDefinition menusDefinition() {
-        return loadYaml("/menus.yml", MenusDefinition.class);
+        return loadYaml("/menu/menus.yml", MenusDefinition.class);
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package com.sequsoft.testui;
+package com.sequsoft.testui.menu;
 
 import java.util.List;
 
@@ -11,6 +11,7 @@ public class MenuDefinition {
         return name;
     }
 
+    @SuppressWarnings("unused")
     public void setName(String name) {
         this.name = name;
     }
@@ -19,6 +20,7 @@ public class MenuDefinition {
         return type;
     }
 
+    @SuppressWarnings("unused")
     public void setType(String type) {
         this.type = type;
     }
@@ -27,6 +29,7 @@ public class MenuDefinition {
         return items;
     }
 
+    @SuppressWarnings("unused")
     public void setItems(List<MenuDefinition> items) {
         this.items = items;
     }
