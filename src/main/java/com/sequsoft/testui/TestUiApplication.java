@@ -56,21 +56,10 @@ public class TestUiApplication extends Application {
                     i.setText(menusBundle.getString(i.getId()));
                 });
             });
-        });
-
-        one.setOnAction(evt -> {
-            currentLocale = Locale.ENGLISH;
-            menusBundle = ResourceBundle.getBundle("menus", currentLocale);
-            Event.fireEvent(menuBar, new Event(LOCALE_CHANGE));
-        });
-
-        two.setOnAction(evt -> {
-            currentLocale = Locale.FRANCE;
-            menusBundle = ResourceBundle.getBundle("menus", currentLocale);
-            Event.fireEvent(menuBar, new Event(LOCALE_CHANGE));
         });*/
 
         menuController = ctx.getBean(MenuController.class);
+        menuController.registerPublisher(ctx);
         children.add(menuController.getMenuBar());
     }
 

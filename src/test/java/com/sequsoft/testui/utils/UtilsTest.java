@@ -15,12 +15,26 @@ public class UtilsTest {
 
         String c;
         int d;
+        String eE;
 
         public B() {}
 
         public B(String c, int d) {
+            this(c, d, null);
+        }
+
+        public B(String c, int d, String eE) {
             this.c = c;
             this.d = d;
+            this.eE = eE;
+        }
+
+        public String geteE() {
+            return eE;
+        }
+
+        public void seteE(String eE) {
+            this.eE = eE;
         }
 
         public String getC() {
@@ -45,12 +59,13 @@ public class UtilsTest {
             if (o == null || getClass() != o.getClass()) return false;
             B b = (B) o;
             return d == b.d &&
-                    Objects.equals(c, b.c);
+                    Objects.equals(c, b.c) &&
+                    Objects.equals(eE, b.eE);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(c, d);
+            return Objects.hash(c, d, eE);
         }
     }
 
@@ -99,6 +114,6 @@ public class UtilsTest {
     @Test
     public void yaml_can_be_loaded_from_resource() {
         SomeYaml someYaml = Utils.loadYaml("/some.yml", SomeYaml.class);
-        assertThat(someYaml, equalTo(new SomeYaml("aa", Arrays.asList(new B("cc", 1), new B("ccc", 2), new B("cccc", 3)))));
+        assertThat(someYaml, equalTo(new SomeYaml("aa", Arrays.asList(new B("cc", 1), new B("ccc", 2), new B("cccc", 3, "4")))));
     }
 }
