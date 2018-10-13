@@ -1,40 +1,44 @@
 package com.sequsoft.testui.menu;
 
-import javafx.event.Event;
+import com.sequsoft.testui.SettingsChangedEvent;
+import com.sequsoft.testui.settings.Settings;
+import javafx.application.Platform;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
 
-import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class MenuController {
+public class MenuController implements ApplicationListener<SettingsChangedEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MenuController.class);
 
     private final MenusDefinition menusDefinition;
     private ApplicationEventPublisher publisher;
     private MenuBar menuBar;
+    private Settings settings;
     private ResourceBundle menusBundle;
 
-    public MenuController(MenusDefinition menusDefinition) {
+    public MenuController(ApplicationEventPublisher publisher, Settings settings, MenusDefinition menusDefinition) {
+        this.publisher = publisher;
+        this.settings = settings;
         this.menusDefinition = menusDefinition;
+        menusBundle = ResourceBundle.getBundle("menu/menus", settings.getLocale());
         createMenuBar();
     }
 
     private void createMenuBar() {
-
-        menusBundle = ResourceBundle.getBundle("menu/menus", Locale.ENGLISH);
 
         menuBar = new MenuBar();
 
         menuBar.setUseSystemMenuBar(true);
 
         menusDefinition.getMenus().forEach(menuDef -> {
-            String menuName = menuDef.getName();
+            String menuName = menusBundle.getString(menuDef.getName());
             Menu m = new Menu(menuName);
             m.setId(menuName);
 
@@ -48,14 +52,16 @@ public class MenuController {
     }
 
     private void createMenu(Menu menu, MenuDefinition menuDef) {
+        String id = menu.getId() + "-" + menuDef.getName();
+        String text = menusBundle.getString(id);
         if (menuDef.getType().equals("menu")) {
-            Menu m = new Menu(menuDef.getName());
-            m.setId(menu.getId() + "-" + menuDef.getName());
+            Menu m = new Menu(text);
+            m.setId(id);
             menu.getItems().add(m);
             menuDef.getItems().forEach(i -> createMenu(m, i));
         } else { // menuitem
-            MenuItem m = new MenuItem(menuDef.getName());
-            m.setId(menu.getId() + "-" + menuDef.getName());
+            MenuItem m = new MenuItem(text);
+            m.setId(id);
             menu.getItems().add(m);
             m.setOnAction(evt -> {
                 MenuItem source = (MenuItem)evt.getSource();
@@ -65,11 +71,26 @@ public class MenuController {
         }
     }
 
+    private void updateMenuBar() {
+        menuBar.getMenus().forEach(m -> {
+            updateMenu(m);
+        });
+    }
+
+    private void updateMenu(MenuItem m) {
+        m.setText(menusBundle.getString(m.getId()));
+        if (m instanceof Menu) {
+            ((Menu)m).getItems().forEach(i -> updateMenu(i));
+        }
+    }
+
     public MenuBar getMenuBar() {
         return menuBar;
     }
 
-    public void registerPublisher(ApplicationEventPublisher publisher) {
-        this.publisher = publisher;
+    @Override
+    public void onApplicationEvent(SettingsChangedEvent settingsChangedEvent) {
+        menusBundle = ResourceBundle.getBundle("menu/menus", settings.getLocale());
+        Platform.runLater(() -> updateMenuBar());
     }
 }

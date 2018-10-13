@@ -3,7 +3,6 @@ package com.sequsoft.testui;
 import com.sequsoft.testui.menu.MenuController;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
-import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,20 +13,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 @SpringBootApplication
 public class TestUiApplication extends Application {
-
-    private static EventType LOCALE_CHANGE = new EventType("LOCALE_CHANGE");
 
     private MenuController menuController;
     private ConfigurableApplicationContext ctx;
     private Parent rootNode;
-
-    Locale currentLocale = null;
-    ResourceBundle menusBundle = null;
 
     @Override
     public void init() throws Exception {
@@ -50,16 +41,7 @@ public class TestUiApplication extends Application {
 
         children.add(l);
 
-        /*menuBar.addEventHandler(LOCALE_CHANGE, x -> {
-            menuBar.getMenus().forEach(m -> {
-                m.getItems().forEach(i -> {
-                    i.setText(menusBundle.getString(i.getId()));
-                });
-            });
-        });*/
-
         menuController = ctx.getBean(MenuController.class);
-        menuController.registerPublisher(ctx);
         children.add(menuController.getMenuBar());
     }
 

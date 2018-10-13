@@ -2,6 +2,9 @@ package com.sequsoft.testui;
 
 import com.sequsoft.testui.menu.MenuController;
 import com.sequsoft.testui.menu.MenusDefinition;
+import com.sequsoft.testui.settings.Settings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ApplicationEventMulticaster;
@@ -13,11 +16,12 @@ import static com.sequsoft.testui.utils.Utils.loadYaml;
 @Configuration
 public class TestUiConfiguration {
 
+    @Autowired
+    ConfigurableApplicationContext ctx;
+
     @Bean
     public ApplicationEventMulticaster applicationEventMulticaster() {
-        SimpleApplicationEventMulticaster eventMulticaster
-                = new SimpleApplicationEventMulticaster();
-
+        SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
         eventMulticaster.setTaskExecutor(new SimpleAsyncTaskExecutor());
         return eventMulticaster;
     }
@@ -28,12 +32,17 @@ public class TestUiConfiguration {
     }
 
     @Bean
+    Settings settings() {
+        return new Settings(ctx);
+    }
+
+    @Bean
     MenusDefinition menusDefinition() {
         return loadYaml("/menu/menus.yml", MenusDefinition.class);
     }
 
     @Bean
     MenuController menuController() {
-        return new MenuController(menusDefinition());
+        return new MenuController(ctx, settings(), menusDefinition());
     }
 }
