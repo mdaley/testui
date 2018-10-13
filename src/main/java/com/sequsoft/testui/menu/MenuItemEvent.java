@@ -1,17 +1,15 @@
 package com.sequsoft.testui.menu;
 
+import javafx.scene.control.MenuItem;
 import org.springframework.context.ApplicationEvent;
 
 public class MenuItemEvent extends ApplicationEvent {
 
-    private String menuItemId;
-
-    public MenuItemEvent(Object source, String menuItemId) {
+    public MenuItemEvent(MenuItem source) {
         super(source);
-        this.menuItemId = menuItemId;
     }
 
     public String getMenuItemId() {
-        return this.menuItemId;
+        return ((MenuItem)getSource()).getId();
     }
 }

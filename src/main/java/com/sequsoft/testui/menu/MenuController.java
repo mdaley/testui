@@ -4,13 +4,16 @@ import javafx.event.Event;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class MenuController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MenuController.class);
 
     private final MenusDefinition menusDefinition;
     private ApplicationEventPublisher publisher;
@@ -54,18 +57,12 @@ public class MenuController {
             MenuItem m = new MenuItem(menuDef.getName());
             m.setId(menu.getId() + "-" + menuDef.getName());
             menu.getItems().add(m);
-            m.setOnAction(e -> {
-                MenuItem source = (MenuItem)e.getSource();
-                System.out.println("Puhlishing menu item event: " + source.getId());
-                publisher.publishEvent(new MenuItemEvent(source, source.getId()));
-                //handleMenuItemSelect(e);
+            m.setOnAction(evt -> {
+                MenuItem source = (MenuItem)evt.getSource();
+                LOGGER.info("Publishing menu item event [{}].", source.getId());
+                publisher.publishEvent(new MenuItemEvent(source));
             });
         }
-    }
-
-    private void handleMenuItemSelect(Event e) {
-        System.out.println("MenuItem id: " + ((MenuItem)e.getSource()).getId());
-        //publisher.publishEvent(new MenuItemEvent());
     }
 
     public MenuBar getMenuBar() {

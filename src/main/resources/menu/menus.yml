@@ -7,12 +7,12 @@ menus:
   - type: menuitem
     name: two
 - type: menu
-  name: edit
+  name: language
   items:
   - type: menuitem
-    name: undo
+    name: french
   - type: menuitem
-    name: redo
+    name: english
 - type: menu
   name: view
   items:
