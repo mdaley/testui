@@ -6,15 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Locale;
 
 public class Settings implements ApplicationListener<MenuItemEvent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
     private final ApplicationEventPublisher publisher;
-    Locale locale;
+
+    private Locale locale;
 
     public Settings(ApplicationEventPublisher publisher) {
         this.publisher = publisher;

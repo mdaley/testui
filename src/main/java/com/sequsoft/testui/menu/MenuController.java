@@ -6,6 +6,8 @@ import javafx.application.Platform;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCombination;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -62,12 +64,24 @@ public class MenuController implements ApplicationListener<SettingsChangedEvent>
         } else { // menuitem
             MenuItem m = new MenuItem(text);
             m.setId(id);
+            addAccelerator(menuDef, m);
             menu.getItems().add(m);
             m.setOnAction(evt -> {
                 MenuItem source = (MenuItem)evt.getSource();
                 LOGGER.info("Publishing menu item event [{}].", source.getId());
                 publisher.publishEvent(new MenuItemEvent(source));
             });
+        }
+    }
+
+    private void addAccelerator(MenuDefinition menuDef, MenuItem m) {
+        String accelerator = menuDef.getAccelerator();
+        if (StringUtils.isNotEmpty(accelerator)) {
+            try {
+                m.setAccelerator(KeyCombination.valueOf(accelerator));
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException(String.format("Invalid accelerator '%s' for menu item '%s'.", accelerator, m.getId()), e);
+            }
         }
     }
 

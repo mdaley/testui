@@ -6,13 +6,17 @@ menus:
     name: one
   - type: menuitem
     name: two
+  - type: menuitem
+    name: ticked
 - type: menu
   name: language
   items:
   - type: menuitem
     name: french
+    accelerator: Shortcut+F
   - type: menuitem
     name: english
+    accelerator: Shortcut+E
 - type: menu
   name: view
   items:
