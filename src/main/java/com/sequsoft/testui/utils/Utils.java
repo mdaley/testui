@@ -18,8 +18,8 @@ public class Utils {
 
             @Override
             public Property getProperty(Class<?> type, String name) {
-                if (name.indexOf("-") > -1) {
-                    name = CaseUtils.toCamelCase(name, false, new char[] {'-'});
+                if (name.contains("-")) {
+                    name = CaseUtils.toCamelCase(name, false, '-');
                 }
                 return super.getProperty(type, name);
             }

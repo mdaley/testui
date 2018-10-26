@@ -3,6 +3,7 @@ package com.sequsoft.testui;
 import com.sequsoft.testui.menu.MenuController;
 import com.sequsoft.testui.menu.MenusDefinition;
 import com.sequsoft.testui.settings.Settings;
+import com.sequsoft.testui.settings.TickSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,9 @@ public class TestUiConfiguration {
     MyListener myListener() {
         return new MyListener();
     }
+
+    @Bean
+    TickSource tickSource() {return new TickSource(ctx); }
 
     @Bean
     Settings settings() {

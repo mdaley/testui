@@ -3,6 +3,7 @@ package com.sequsoft.testui.menu;
 import com.sequsoft.testui.SettingChangedEvent;
 import com.sequsoft.testui.settings.Settings;
 import javafx.application.Platform;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -10,8 +11,8 @@ import javafx.scene.input.KeyCombination;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.ResourceBundle;
 
@@ -20,13 +21,13 @@ public class MenuController implements ApplicationListener<SettingChangedEvent> 
     private static final Logger LOGGER = LoggerFactory.getLogger(MenuController.class);
 
     private final MenusDefinition menusDefinition;
-    private ApplicationEventPublisher publisher;
+    private ConfigurableApplicationContext ctx;
     private MenuBar menuBar;
     private Settings settings;
     private ResourceBundle menusBundle;
 
-    public MenuController(ApplicationEventPublisher publisher, Settings settings, MenusDefinition menusDefinition) {
-        this.publisher = publisher;
+    public MenuController(ConfigurableApplicationContext ctx, Settings settings, MenusDefinition menusDefinition) {
+        this.ctx = ctx;
         this.settings = settings;
         this.menusDefinition = menusDefinition;
         menusBundle = ResourceBundle.getBundle("menu/menus", settings.getLocale());
@@ -49,7 +50,6 @@ public class MenuController implements ApplicationListener<SettingChangedEvent> 
             menuBar.getMenus().add(m);
         });
 
-        Menu file = new Menu("File");
         menuBar.setUseSystemMenuBar(true);
     }
 
@@ -61,6 +61,11 @@ public class MenuController implements ApplicationListener<SettingChangedEvent> 
             m.setId(id);
             menu.getItems().add(m);
             menuDef.getItems().forEach(i -> createMenu(m, i));
+        } else if (menuDef.getType().equals("checkedmenuitem")) {
+            ListeningCheckMenuItem m = new ListeningCheckMenuItem(ctx, text, menuDef.getValueChangeId());
+            m.setId(id);
+            addAccelerator(menuDef, m);
+            menu.getItems().add(m);
         } else { // menuitem
             MenuItem m = new MenuItem(text);
             m.setId(id);
@@ -69,7 +74,7 @@ public class MenuController implements ApplicationListener<SettingChangedEvent> 
             m.setOnAction(evt -> {
                 MenuItem source = (MenuItem)evt.getSource();
                 LOGGER.info("Publishing menu item event [{}].", source.getId());
-                publisher.publishEvent(new MenuItemEvent(source));
+                ctx.publishEvent(new MenuItemEvent(source));
             });
         }
     }
