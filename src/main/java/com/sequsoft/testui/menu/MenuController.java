@@ -1,6 +1,6 @@
 package com.sequsoft.testui.menu;
 
-import com.sequsoft.testui.SettingsChangedEvent;
+import com.sequsoft.testui.SettingChangedEvent;
 import com.sequsoft.testui.settings.Settings;
 import javafx.application.Platform;
 import javafx.scene.control.Menu;
@@ -15,7 +15,7 @@ import org.springframework.context.ApplicationListener;
 
 import java.util.ResourceBundle;
 
-public class MenuController implements ApplicationListener<SettingsChangedEvent> {
+public class MenuController implements ApplicationListener<SettingChangedEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MenuController.class);
 
@@ -103,7 +103,7 @@ public class MenuController implements ApplicationListener<SettingsChangedEvent>
     }
 
     @Override
-    public void onApplicationEvent(SettingsChangedEvent settingsChangedEvent) {
+    public void onApplicationEvent(SettingChangedEvent settingChangedEvent) {
         menusBundle = ResourceBundle.getBundle("menu/menus", settings.getLocale());
         Platform.runLater(() -> updateMenuBar());
     }

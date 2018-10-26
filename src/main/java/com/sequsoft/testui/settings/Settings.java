@@ -1,6 +1,6 @@
 package com.sequsoft.testui.settings;
 
-import com.sequsoft.testui.SettingsChangedEvent;
+import com.sequsoft.testui.SettingChangedEvent;
 import com.sequsoft.testui.menu.MenuItemEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class Settings implements ApplicationListener<MenuItemEvent> {
 
         if (update) {
             LOGGER.info("Publishing LOCALE settings changed event");
-            publisher.publishEvent(new SettingsChangedEvent(this, "LOCALE"));
+            publisher.publishEvent(new SettingChangedEvent(this, "LOCALE"));
         }
     }
 }

@@ -2,10 +2,10 @@ package com.sequsoft.testui;
 
 import org.springframework.context.ApplicationEvent;
 
-public class SettingsChangedEvent extends ApplicationEvent {
+public class SettingChangedEvent extends ApplicationEvent {
     private final String type;
 
-    public SettingsChangedEvent(Object source, String type) {
+    public SettingChangedEvent(Object source, String type) {
         super(source);
         this.type = type;
     }
