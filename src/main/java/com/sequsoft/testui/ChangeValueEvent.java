@@ -10,4 +10,8 @@ public class ChangeValueEvent extends ApplicationEvent {
         super(source);
         this.valueChangeId = valueChangeId;
     }
+
+    public String getValueChangeId() {
+        return valueChangeId;
+    }
 }

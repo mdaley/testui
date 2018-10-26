@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.function.Function;
+
 public class TickSource implements ApplicationListener<ChangeValueEvent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TickSource.class);
 
@@ -20,24 +22,32 @@ public class TickSource implements ApplicationListener<ChangeValueEvent> {
     }
 
     public boolean isTicked() {
+        LOGGER.info("isTicked called! ticked = {}", ticked);
         return ticked;
     }
 
     public void setTicked(boolean ticked) {
         this.ticked = ticked;
         LOGGER.info("Publishing tick changed event");
-        ctx.publishEvent(new ValueChangedEvent(this));
+
+        Function<Object, Boolean> fn = o -> ((TickSource)o).isTicked();
+        ctx.publishEvent(new ValueChangedEvent(this, "ticked", fn));
     }
 
     public void toggleTicked() {
         ticked = !ticked;
         LOGGER.info("Publishing tick toggled event");
-        ctx.publishEvent(new ValueChangedEvent(this));
+
+        Function<Object, Boolean> fn = o -> ((TickSource)o).isTicked();
+
+        ctx.publishEvent(new ValueChangedEvent(this, "ticked", fn));
     }
 
     @Override
     public void onApplicationEvent(ChangeValueEvent changeValueEvent) {
-        LOGGER.info(("Received changeValueEvent. Tick toggled!"));
-        toggleTicked();
+        if (changeValueEvent.getValueChangeId().equals("ticked")) {
+            LOGGER.info(("Received 'ticked' changeValueEvent. Tick toggled!"));
+            toggleTicked();
+        }
     }
 }

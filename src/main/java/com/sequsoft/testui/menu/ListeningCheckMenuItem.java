@@ -2,6 +2,7 @@ package com.sequsoft.testui.menu;
 
 import com.sequsoft.testui.ChangeValueEvent;
 import com.sequsoft.testui.ValueChangedEvent;
+import com.sequsoft.testui.settings.TickSource;
 import javafx.scene.control.CheckMenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,11 @@ public class ListeningCheckMenuItem extends CheckMenuItem implements Application
 
     @Override
     public void onApplicationEvent(ValueChangedEvent valueChangedEvent) {
-        LOGGER.info("Received setting changed event {}", valueChangedEvent);
+        if (valueChangedEvent.getValueChangeId().equals(valueChangeId)) {
+            LOGGER.info("Received value changed event {}", valueChangedEvent);
+            this.setSelected(valueChangedEvent.getFn().apply(valueChangedEvent.getSource()));
+
+            //this.setSelected(((TickSource) valueChangedEvent.getSource()).isTicked());
+        }
     }
 }
