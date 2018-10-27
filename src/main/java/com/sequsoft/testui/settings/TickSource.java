@@ -29,7 +29,7 @@ public class TickSource {
         this.ticked = ticked;
         LOGGER.info("Publishing tick changed event");
 
-        Function<Object, Boolean> fn = o -> ((TickSource)o).isTicked();
+        Function fn = o -> ((TickSource)o).isTicked();
         ctx.publishEvent(new ValueChangedEvent(this, "ticked", fn));
     }
 
@@ -37,7 +37,7 @@ public class TickSource {
         ticked = !ticked;
         LOGGER.info("Publishing tick toggled event");
 
-        Function<Object, Boolean> fn = o -> ((TickSource)o).isTicked();
+        Function fn = o -> ((TickSource)o).isTicked();
 
         ctx.publishEvent(new ValueChangedEvent(this, "ticked", fn));
     }

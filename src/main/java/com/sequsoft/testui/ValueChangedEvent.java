@@ -1,6 +1,5 @@
 package com.sequsoft.testui;
 
-import com.sequsoft.testui.settings.TickSource;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.function.Function;
@@ -8,19 +7,19 @@ import java.util.function.Function;
 public class ValueChangedEvent extends ApplicationEvent {
 
     private final String valueChangeId;
-    private final Function<Object, Boolean> fn;
+    private final Function ValueRetrieverFn;
 
-    public ValueChangedEvent(Object source, String valueChangeId, Function<Object, Boolean> fn ) {
+    public ValueChangedEvent(Object source, String valueChangeId, Function valueRetrieverFn) {
         super(source);
         this.valueChangeId = valueChangeId;
-        this.fn = fn;
+        this.ValueRetrieverFn = valueRetrieverFn;
     }
 
     public String getValueChangeId() {
         return valueChangeId;
     }
 
-    public Function<Object, Boolean> getFn() {
-        return fn;
+    public Function getValueRetrieverFn() {
+        return ValueRetrieverFn;
     }
 }

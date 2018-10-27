@@ -27,7 +27,7 @@ public class ListeningCheckMenuItem extends CheckMenuItem implements Application
     public void onApplicationEvent(ValueChangedEvent valueChangedEvent) {
         if (valueChangedEvent.getValueChangeId().equals(valueChangeId)) {
             LOGGER.info("Received value changed event {}", valueChangedEvent);
-            Platform.runLater(() -> this.setSelected(valueChangedEvent.getFn().apply(valueChangedEvent.getSource())));
+            Platform.runLater(() -> this.setSelected((Boolean)valueChangedEvent.getValueRetrieverFn().apply(valueChangedEvent.getSource())));
         }
     }
 }
