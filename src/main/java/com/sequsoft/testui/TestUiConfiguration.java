@@ -29,7 +29,7 @@ public class TestUiConfiguration {
 
     @Bean
     MyListener myListener() {
-        return new MyListener();
+        return new MyListener(ctx);
     }
 
     @Bean
