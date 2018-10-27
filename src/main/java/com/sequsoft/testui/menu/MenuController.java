@@ -1,9 +1,8 @@
 package com.sequsoft.testui.menu;
 
-import com.sequsoft.testui.SettingChangedEvent;
+import com.sequsoft.testui.ValueChangedEvent;
 import com.sequsoft.testui.settings.Settings;
 import javafx.application.Platform;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -14,9 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class MenuController implements ApplicationListener<SettingChangedEvent> {
+public class MenuController implements ApplicationListener<ValueChangedEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MenuController.class);
 
@@ -108,8 +108,10 @@ public class MenuController implements ApplicationListener<SettingChangedEvent> 
     }
 
     @Override
-    public void onApplicationEvent(SettingChangedEvent settingChangedEvent) {
-        menusBundle = ResourceBundle.getBundle("menu/menus", settings.getLocale());
-        Platform.runLater(() -> updateMenuBar());
+    public void onApplicationEvent(ValueChangedEvent valueChangedEvent) {
+        if (valueChangedEvent.getValueChangeId().equals("locale")) {
+            menusBundle = ResourceBundle.getBundle("menu/menus", (Locale) valueChangedEvent.retrieveValue());
+            Platform.runLater(() -> updateMenuBar());
+        }
     }
 }

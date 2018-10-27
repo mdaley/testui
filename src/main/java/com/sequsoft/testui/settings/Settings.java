@@ -1,12 +1,13 @@
 package com.sequsoft.testui.settings;
 
-import com.sequsoft.testui.SettingChangedEvent;
+import com.sequsoft.testui.ValueChangedEvent;
 import com.sequsoft.testui.menu.MenuItemEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import java.util.Locale;
+import java.util.function.Function;
 
 public class Settings implements ApplicationListener<MenuItemEvent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
@@ -24,23 +25,18 @@ public class Settings implements ApplicationListener<MenuItemEvent> {
     }
 
     public void setLocale(Locale locale) {
+        this.locale = locale;
+        Function fn = o -> ((Settings)o).getLocale();
+        publisher.publishEvent(new ValueChangedEvent(this, "locale", fn));
     }
 
     @Override
     public void onApplicationEvent(MenuItemEvent menuItemEvent) {
         String id = menuItemEvent.getMenuItemId();
-        boolean update = false;
         if (id.equals("language-french")) {
-            locale = Locale.FRANCE;
-            update = true;
+            setLocale(Locale.FRANCE);
         } else if (id.equals("language-english")) {
-            locale = Locale.ENGLISH;
-            update = true;
-        }
-
-        if (update) {
-            LOGGER.info("Publishing LOCALE settings changed event");
-            publisher.publishEvent(new SettingChangedEvent(this, "LOCALE"));
+            setLocale(Locale.ENGLISH);
         }
     }
 }
