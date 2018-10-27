@@ -47,6 +47,6 @@ public class TestUiConfiguration {
 
     @Bean
     MenuController menuController() {
-        return new MenuController(ctx, settings(), menusDefinition());
+        return new MenuController(ctx, () -> settings().getLocale(), menusDefinition());
     }
 }

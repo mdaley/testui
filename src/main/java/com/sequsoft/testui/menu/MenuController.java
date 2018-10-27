@@ -1,7 +1,6 @@
 package com.sequsoft.testui.menu;
 
 import com.sequsoft.testui.ValueChangedEvent;
-import com.sequsoft.testui.settings.Settings;
 import javafx.application.Platform;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -15,6 +14,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 public class MenuController implements ApplicationListener<ValueChangedEvent> {
 
@@ -23,14 +23,12 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
     private final MenusDefinition menusDefinition;
     private ConfigurableApplicationContext ctx;
     private MenuBar menuBar;
-    private Settings settings;
     private ResourceBundle menusBundle;
 
-    public MenuController(ConfigurableApplicationContext ctx, Settings settings, MenusDefinition menusDefinition) {
+    public MenuController(ConfigurableApplicationContext ctx, Supplier<Locale> initialLocaleSupplier, MenusDefinition menusDefinition) {
         this.ctx = ctx;
-        this.settings = settings;
         this.menusDefinition = menusDefinition;
-        menusBundle = ResourceBundle.getBundle("menu/menus", settings.getLocale());
+        menusBundle = ResourceBundle.getBundle("menu/menus", initialLocaleSupplier.get());
         createMenuBar();
     }
 
