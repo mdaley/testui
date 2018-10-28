@@ -8,13 +8,17 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 public class MenuController implements ApplicationListener<ValueChangedEvent> {
@@ -52,44 +56,66 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         menuBar.setUseSystemMenuBar(true);
     }
 
-    private void createMenu(Menu menu, MenuDefinition menuDef) {
+    private Map<String, BiConsumer<Menu, MenuDefinition>> dispatcher;
 
-        if (menuDef.getType().equals("separator")) {
-            SeparatorMenuItem m = new SeparatorMenuItem();
-            menu.getItems().add(m);
-            return;
+    private Map<String, BiConsumer<Menu, MenuDefinition>> dispatcher() {
+
+        if (dispatcher != null) {
+            return dispatcher;
         }
 
+        dispatcher = new HashMap<>();
+        dispatcher.put("separator", this::addSeparator);
+        dispatcher.put("menu", this::addMenu);
+        dispatcher.put("checkedmenuitem", this::addCheckedMenuItem);
+        dispatcher.put("menuitem", this::addMenuItem);
+
+        return dispatcher;
+    }
+
+    private void createMenu(Menu menu, MenuDefinition menuDef) {
+        dispatcher().getOrDefault(menuDef.getType(), this::failOnInvalidMenuType).accept(menu, menuDef);
+    }
+
+    private void failOnInvalidMenuType(Menu __, MenuDefinition menuDef) {
+        throw new MenuConstructionException(String.format("The menu type [%s] is invalid", menuDef.getType()));
+    }
+
+    private void addMenuItem(Menu menu, MenuDefinition menuDef) {
         String id = menu.getId() + "-" + menuDef.getName();
         String text = menusBundle.getString(id);
-        switch (menuDef.getType()) {
-            case "menu": {
-                Menu m = new Menu(text);
-                m.setId(id);
-                menu.getItems().add(m);
-                menuDef.getItems().forEach(i -> createMenu(m, i));
-                break;
-            }
-            case "checkedmenuitem": {
-                ListeningCheckMenuItem m = new ListeningCheckMenuItem(ctx, text, menuDef.getValueChangeId());
-                m.setId(id);
-                addAccelerator(menuDef, m);
-                menu.getItems().add(m);
-                break;
-            }
-            default: { // menuitem
-                MenuItem m = new MenuItem(text);
-                m.setId(id);
-                addAccelerator(menuDef, m);
-                menu.getItems().add(m);
-                m.setOnAction(evt -> {
-                    MenuItem source = (MenuItem) evt.getSource();
-                    LOGGER.info("Publishing menu item event [{}].", source.getId());
-                    ctx.publishEvent(new MenuItemEvent(source));
-                });
-                break;
-            }
-        }
+        MenuItem m = new MenuItem(text);
+        m.setId(id);
+        addAccelerator(menuDef, m);
+        menu.getItems().add(m);
+        m.setOnAction(evt -> {
+            MenuItem source = (MenuItem) evt.getSource();
+            LOGGER.info("Publishing menu item event [{}].", source.getId());
+            ctx.publishEvent(new MenuItemEvent(source));
+        });
+    }
+
+    private void addCheckedMenuItem(Menu menu, MenuDefinition menuDef) {
+        String id = menu.getId() + "-" + menuDef.getName();
+        String text = menusBundle.getString(id);
+        ListeningCheckMenuItem m = new ListeningCheckMenuItem(ctx, text, menuDef.getValueChangeId());
+        m.setId(id);
+        addAccelerator(menuDef, m);
+        menu.getItems().add(m);
+    }
+
+    private void addMenu(Menu menu, MenuDefinition menuDef) {
+        String id = menu.getId() + "-" + menuDef.getName();
+        String text = menusBundle.getString(id);
+        Menu m = new Menu(text);
+        m.setId(id);
+        menu.getItems().add(m);
+        menuDef.getItems().forEach(i -> createMenu(m, i));
+    }
+
+    private void addSeparator(Menu menu, MenuDefinition __) {
+        SeparatorMenuItem m = new SeparatorMenuItem();
+        menu.getItems().add(m);
     }
 
     private void addAccelerator(MenuDefinition menuDef, MenuItem m) {
@@ -108,6 +134,10 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
     }
 
     private void updateMenu(MenuItem m) {
+        if (m.getId() == null) {
+            return;
+        }
+
         m.setText(menusBundle.getString(m.getId()));
         if (m instanceof Menu) {
             ((Menu)m).getItems().forEach(this::updateMenu);
