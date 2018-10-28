@@ -6,6 +6,7 @@ menus:
     name: one
   - type: menuitem
     name: two
+  - type: separator
   - type: checkedmenuitem
     name: ticked
     value-change-id: ticked

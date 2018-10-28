@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -25,10 +26,10 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
     private MenuBar menuBar;
     private ResourceBundle menusBundle;
 
-    public MenuController(ConfigurableApplicationContext ctx, Supplier<Locale> initialLocaleSupplier, MenusDefinition menusDefinition) {
+    public MenuController(ConfigurableApplicationContext ctx, Locale initialLocale, MenusDefinition menusDefinition) {
         this.ctx = ctx;
         this.menusDefinition = menusDefinition;
-        menusBundle = ResourceBundle.getBundle("menu/menus", initialLocaleSupplier.get());
+        menusBundle = ResourceBundle.getBundle("menu/menus", initialLocale);
         createMenuBar();
     }
 
@@ -52,28 +53,42 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
     }
 
     private void createMenu(Menu menu, MenuDefinition menuDef) {
+
+        if (menuDef.getType().equals("separator")) {
+            SeparatorMenuItem m = new SeparatorMenuItem();
+            menu.getItems().add(m);
+            return;
+        }
+
         String id = menu.getId() + "-" + menuDef.getName();
         String text = menusBundle.getString(id);
-        if (menuDef.getType().equals("menu")) {
-            Menu m = new Menu(text);
-            m.setId(id);
-            menu.getItems().add(m);
-            menuDef.getItems().forEach(i -> createMenu(m, i));
-        } else if (menuDef.getType().equals("checkedmenuitem")) {
-            ListeningCheckMenuItem m = new ListeningCheckMenuItem(ctx, text, menuDef.getValueChangeId());
-            m.setId(id);
-            addAccelerator(menuDef, m);
-            menu.getItems().add(m);
-        } else { // menuitem
-            MenuItem m = new MenuItem(text);
-            m.setId(id);
-            addAccelerator(menuDef, m);
-            menu.getItems().add(m);
-            m.setOnAction(evt -> {
-                MenuItem source = (MenuItem)evt.getSource();
-                LOGGER.info("Publishing menu item event [{}].", source.getId());
-                ctx.publishEvent(new MenuItemEvent(source));
-            });
+        switch (menuDef.getType()) {
+            case "menu": {
+                Menu m = new Menu(text);
+                m.setId(id);
+                menu.getItems().add(m);
+                menuDef.getItems().forEach(i -> createMenu(m, i));
+                break;
+            }
+            case "checkedmenuitem": {
+                ListeningCheckMenuItem m = new ListeningCheckMenuItem(ctx, text, menuDef.getValueChangeId());
+                m.setId(id);
+                addAccelerator(menuDef, m);
+                menu.getItems().add(m);
+                break;
+            }
+            default: { // menuitem
+                MenuItem m = new MenuItem(text);
+                m.setId(id);
+                addAccelerator(menuDef, m);
+                menu.getItems().add(m);
+                m.setOnAction(evt -> {
+                    MenuItem source = (MenuItem) evt.getSource();
+                    LOGGER.info("Publishing menu item event [{}].", source.getId());
+                    ctx.publishEvent(new MenuItemEvent(source));
+                });
+                break;
+            }
         }
     }
 
@@ -89,15 +104,13 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
     }
 
     private void updateMenuBar() {
-        menuBar.getMenus().forEach(m -> {
-            updateMenu(m);
-        });
+        menuBar.getMenus().forEach(this::updateMenu);
     }
 
     private void updateMenu(MenuItem m) {
         m.setText(menusBundle.getString(m.getId()));
         if (m instanceof Menu) {
-            ((Menu)m).getItems().forEach(i -> updateMenu(i));
+            ((Menu)m).getItems().forEach(this::updateMenu);
         }
     }
 
@@ -109,7 +122,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
     public void onApplicationEvent(ValueChangedEvent valueChangedEvent) {
         if (valueChangedEvent.getValueChangeId().equals("locale")) {
             menusBundle = ResourceBundle.getBundle("menu/menus", (Locale) valueChangedEvent.retrieveValue());
-            Platform.runLater(() -> updateMenuBar());
+            Platform.runLater(this::updateMenuBar);
         }
     }
 }
