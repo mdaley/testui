@@ -5,7 +5,6 @@ import java.util.List;
 public class MenuDefinition {
     private String type;
     private String name;
-    private String accelerator;
     private String valueChangeId;
 
     private List<MenuDefinition> items;
@@ -35,15 +34,6 @@ public class MenuDefinition {
     @SuppressWarnings("unused")
     public void setItems(List<MenuDefinition> items) {
         this.items = items;
-    }
-
-    public String getAccelerator() {
-        return accelerator;
-    }
-
-    @SuppressWarnings("unused")
-    public void setAccelerator(String accelerator) {
-        this.accelerator = accelerator;
     }
 
     public String getValueChangeId() {

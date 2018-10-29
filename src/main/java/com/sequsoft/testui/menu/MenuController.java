@@ -8,7 +8,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.util.TriConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -29,12 +28,11 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
     private MenuBar menuBar;
     private ResourceBundle menusBundle;
     private ResourceBundle baseMenusBundle;
-    private Locale baseLocale;
 
     public MenuController(ConfigurableApplicationContext ctx, MenusDefinition menusDefinition) {
         this.ctx = ctx;
         this.menusDefinition = menusDefinition;
-        baseLocale = Locale.forLanguageTag(menusDefinition.getDefaultLocale());
+        Locale baseLocale = Locale.forLanguageTag(menusDefinition.getDefaultLocale());
         menusBundle = ResourceBundle.getBundle("menu/menus", baseLocale);
         baseMenusBundle = menusBundle;
         createMenuBar();
@@ -93,7 +91,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         String text = getTextOrBase(id);
         MenuItem m = new MenuItem(text);
         m.setId(id);
-        addAccelerator(menuDef, m);
+        addAccelerator(m);
         menu.getItems().add(m);
         m.setOnAction(evt -> {
             MenuItem source = (MenuItem) evt.getSource();
@@ -107,7 +105,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         String text = getTextOrBase(id);
         ListeningCheckMenuItem m = new ListeningCheckMenuItem(ctx, text, menuDef.getValueChangeId());
         m.setId(id);
-        addAccelerator(menuDef, m);
+        addAccelerator(m);
         menu.getItems().add(m);
     }
 
@@ -125,8 +123,17 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         menu.getItems().add(m);
     }
 
-    private void addAccelerator(MenuDefinition menuDef, MenuItem m) {
-        String accelerator = menuDef.getAccelerator();
+    private void addAccelerator(MenuItem m) {
+        String acceleratorKey = m.getId() + "-accelerator";
+
+        String accelerator = null;
+
+        if (menusBundle.containsKey(acceleratorKey)) {
+            accelerator = menusBundle.getString(acceleratorKey);
+        } else if (baseMenusBundle.containsKey(acceleratorKey)) {
+            accelerator = baseMenusBundle.getString(acceleratorKey);
+        }
+
         if (StringUtils.isNotEmpty(accelerator)) {
             try {
                 m.setAccelerator(KeyCombination.valueOf(accelerator));
@@ -134,6 +141,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
                 throw new RuntimeException(String.format("Invalid accelerator '%s' for menu item '%s'.", accelerator, m.getId()), e);
             }
         }
+
     }
 
     private void updateMenuBar() {
@@ -149,6 +157,8 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         if (m instanceof Menu) {
             ((Menu)m).getItems().forEach(this::updateMenu);
         }
+
+        addAccelerator(m);
     }
 
     public MenuBar getMenuBar() {
