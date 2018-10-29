@@ -19,7 +19,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 public class MenuController implements ApplicationListener<ValueChangedEvent> {
 
@@ -29,11 +28,15 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
     private ConfigurableApplicationContext ctx;
     private MenuBar menuBar;
     private ResourceBundle menusBundle;
+    private ResourceBundle baseMenusBundle;
+    private Locale baseLocale;
 
-    public MenuController(ConfigurableApplicationContext ctx, Locale initialLocale, MenusDefinition menusDefinition) {
+    public MenuController(ConfigurableApplicationContext ctx, MenusDefinition menusDefinition) {
         this.ctx = ctx;
         this.menusDefinition = menusDefinition;
-        menusBundle = ResourceBundle.getBundle("menu/menus", initialLocale);
+        baseLocale = Locale.forLanguageTag(menusDefinition.getDefaultLocale());
+        menusBundle = ResourceBundle.getBundle("menu/menus", baseLocale);
+        baseMenusBundle = menusBundle;
         createMenuBar();
     }
 
@@ -81,9 +84,13 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         throw new MenuConstructionException(String.format("The menu type [%s] is invalid", menuDef.getType()));
     }
 
+    private String getTextOrBase(String id) {
+        return menusBundle.containsKey(id) ? menusBundle.getString(id) : baseMenusBundle.getString(id);
+    }
+
     private void addMenuItem(Menu menu, MenuDefinition menuDef) {
         String id = menu.getId() + "-" + menuDef.getName();
-        String text = menusBundle.getString(id);
+        String text = getTextOrBase(id);
         MenuItem m = new MenuItem(text);
         m.setId(id);
         addAccelerator(menuDef, m);
@@ -97,7 +104,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
 
     private void addCheckedMenuItem(Menu menu, MenuDefinition menuDef) {
         String id = menu.getId() + "-" + menuDef.getName();
-        String text = menusBundle.getString(id);
+        String text = getTextOrBase(id);
         ListeningCheckMenuItem m = new ListeningCheckMenuItem(ctx, text, menuDef.getValueChangeId());
         m.setId(id);
         addAccelerator(menuDef, m);
@@ -106,7 +113,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
 
     private void addMenu(Menu menu, MenuDefinition menuDef) {
         String id = menu.getId() + "-" + menuDef.getName();
-        String text = menusBundle.getString(id);
+        String text = getTextOrBase(id);
         Menu m = new Menu(text);
         m.setId(id);
         menu.getItems().add(m);
@@ -138,7 +145,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
             return;
         }
 
-        m.setText(menusBundle.getString(m.getId()));
+        m.setText(getTextOrBase(m.getId()));
         if (m instanceof Menu) {
             ((Menu)m).getItems().forEach(this::updateMenu);
         }
