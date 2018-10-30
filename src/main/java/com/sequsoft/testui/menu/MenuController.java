@@ -6,6 +6,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -92,6 +93,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         MenuItem m = new MenuItem(text);
         m.setId(id);
         addAccelerator(m);
+        addIcon(m, menuDef);
         menu.getItems().add(m);
         m.setOnAction(evt -> {
             MenuItem source = (MenuItem) evt.getSource();
@@ -114,6 +116,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         String text = getTextOrBase(id);
         Menu m = new Menu(text);
         m.setId(id);
+        addIcon(m, menuDef);
         menu.getItems().add(m);
         menuDef.getItems().forEach(i -> createMenu(m, i));
     }
@@ -142,6 +145,14 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
             }
         }
 
+    }
+
+    private void addIcon(MenuItem m, MenuDefinition menuDef) {
+        String icon = menuDef.getIcon();
+        if (StringUtils.isNotEmpty(icon)) {
+            ImageView imgv = new ImageView("/icons/" + icon);
+            m.setGraphic(imgv);
+        }
     }
 
     private void updateMenuBar() {

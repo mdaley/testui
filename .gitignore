@@ -2,3 +2,4 @@
 *.iml
 valueChangeId/
 target/
+.DS_Store
