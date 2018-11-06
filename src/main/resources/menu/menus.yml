@@ -23,10 +23,8 @@ menus:
   items:
   - type: menuitem
     name: a
-    icon: social-001_forrst.png
   - type: menu
     name: subview
-    icon: social-036_android.png
     items:
     - type: menuitem
       name: subviewitem

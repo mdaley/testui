@@ -6,6 +6,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -87,13 +90,18 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         return menusBundle.containsKey(id) ? menusBundle.getString(id) : baseMenusBundle.getString(id);
     }
 
+    private String getTextOrBaseOrNull(String id) {
+        return menusBundle.containsKey(id) ? menusBundle.getString(id) :
+                baseMenusBundle.containsKey(id) ? baseMenusBundle.getString(id) : null;
+    }
+
     private void addMenuItem(Menu menu, MenuDefinition menuDef) {
         String id = menu.getId() + "-" + menuDef.getName();
         String text = getTextOrBase(id);
         MenuItem m = new MenuItem(text);
         m.setId(id);
         addAccelerator(m);
-        addIcon(m, menuDef);
+        addIcon(m);
         menu.getItems().add(m);
         m.setOnAction(evt -> {
             MenuItem source = (MenuItem) evt.getSource();
@@ -116,7 +124,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         String text = getTextOrBase(id);
         Menu m = new Menu(text);
         m.setId(id);
-        addIcon(m, menuDef);
+        addIcon(m);
         menu.getItems().add(m);
         menuDef.getItems().forEach(i -> createMenu(m, i));
     }
@@ -127,15 +135,11 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
     }
 
     private void addAccelerator(MenuItem m) {
+        m.setAccelerator(null);
+
         String acceleratorKey = m.getId() + "-accelerator";
 
-        String accelerator = null;
-
-        if (menusBundle.containsKey(acceleratorKey)) {
-            accelerator = menusBundle.getString(acceleratorKey);
-        } else if (baseMenusBundle.containsKey(acceleratorKey)) {
-            accelerator = baseMenusBundle.getString(acceleratorKey);
-        }
+        String accelerator = getTextOrBaseOrNull(acceleratorKey);
 
         if (StringUtils.isNotEmpty(accelerator)) {
             try {
@@ -144,14 +148,20 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
                 throw new RuntimeException(String.format("Invalid accelerator '%s' for menu item '%s'.", accelerator, m.getId()), e);
             }
         }
-
     }
 
-    private void addIcon(MenuItem m, MenuDefinition menuDef) {
-        String icon = menuDef.getIcon();
-        if (StringUtils.isNotEmpty(icon)) {
-            ImageView imgv = new ImageView("/icons/" + icon);
-            m.setGraphic(imgv);
+    private void addIcon(MenuItem m) {
+        m.setGraphic(null);
+
+        String iconId = getTextOrBaseOrNull(m.getId() + "-icon");
+        if (iconId != null) {
+            try (InputStream s = getClass().getResourceAsStream("/icons/" + iconId)) {
+                if (s != null) {
+                    m.setGraphic(new ImageView(new Image(s)));
+                }
+            } catch (IOException e) {
+                LOGGER.warn("Missing icon [{}]", iconId);
+            }
         }
     }
 
@@ -170,6 +180,7 @@ public class MenuController implements ApplicationListener<ValueChangedEvent> {
         }
 
         addAccelerator(m);
+        addIcon(m);
     }
 
     public MenuBar getMenuBar() {

@@ -6,7 +6,6 @@ public class MenuDefinition {
     private String type;
     private String name;
     private String valueChangeId;
-    private String icon;
 
     private List<MenuDefinition> items;
 
@@ -43,13 +42,5 @@ public class MenuDefinition {
 
     public void setValueChangeId(String valueChangeId) {
         this.valueChangeId = valueChangeId;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
     }
 }
